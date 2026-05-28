@@ -192,7 +192,8 @@
 
     .button span { position: relative; z-index: 1; }
 
-    .button:hover {
+    .button:hover,
+    .button.is-redirecting {
       transform: translateY(-2px) scale(1.012);
       background: rgba(207, 249, 143, .90);
       border-color: rgba(255,255,255,.9);
@@ -250,8 +251,26 @@
       const cfg = window.VODALESA_CONFIG || {};
       const button = document.getElementById('ticketButton');
       if (button) {
+        const resetButton = () => button.classList.remove('is-redirecting');
+
         if (cfg.buttonText) button.querySelector('span').textContent = cfg.buttonText;
         if (cfg.ticketsUrl) button.href = cfg.ticketsUrl;
+        button.addEventListener('click', (event) => {
+          const url = button.href;
+          if (!url || url.endsWith('#')) return;
+
+          event.preventDefault();
+          if (button.classList.contains('is-redirecting')) return;
+
+          button.classList.add('is-redirecting');
+          window.setTimeout(() => {
+            resetButton();
+            window.location.href = url;
+          }, 500);
+        });
+
+        window.addEventListener('pageshow', resetButton);
+        window.addEventListener('focus', resetButton);
       }
     })();
 
