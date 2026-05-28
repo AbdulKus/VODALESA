@@ -33,8 +33,6 @@
 
     body {
       min-height: 100svh;
-      display: grid;
-      place-items: center;
       isolation: isolate;
     }
 
@@ -97,20 +95,45 @@
     }
 
     main {
-      width: min(980px, calc(100vw - 28px));
-      min-height: min(640px, calc(100svh - 28px));
+      width: min(1120px, calc(100vw - 28px));
+      min-height: 100svh;
+      margin: 0 auto;
+      display: grid;
+      grid-template-rows: minmax(132px, 28svh) minmax(250px, 1fr) minmax(126px, 24svh);
+      align-items: center;
+      justify-items: center;
+      padding: clamp(16px, 3.5vw, 46px) clamp(14px, 4vw, 52px);
+      gap: clamp(12px, 2.4svh, 28px);
+    }
+
+    .hero-logo,
+    .center-stage,
+    .purchase-strip {
+      width: 100%;
       display: grid;
       place-items: center;
-      padding: clamp(18px, 4vw, 52px);
+    }
+
+    .hero-logo {
+      align-self: stretch;
+    }
+
+    .center-stage {
+      align-self: center;
+    }
+
+    .purchase-strip {
+      align-self: stretch;
+      align-content: center;
     }
 
     .poster {
       position: relative;
-      width: 100%;
+      width: min(100%, 760px);
+      min-height: clamp(230px, 34svh, 360px);
       display: grid;
       place-items: center;
-      gap: clamp(30px, 5vw, 46px);
-      padding: clamp(28px, 6vw, 66px);
+      padding: clamp(28px, 5vw, 58px);
       border: 1px solid var(--line);
       border-radius: 34px;
       background:
@@ -136,7 +159,7 @@
     }
 
     .logo-wrap {
-      width: min(100%, 900px);
+      width: min(100%, 1080px);
     }
 
     .logo {
@@ -157,6 +180,92 @@
     @supports not ((-webkit-mask: url('./logo.png') center / contain no-repeat) or (mask: url('./logo.png') center / contain no-repeat)) {
       .logo { display: none; }
       .logo-fallback { display: block; }
+    }
+
+    .artists-orbit {
+      position: relative;
+      width: min(100%, 620px);
+      min-height: clamp(170px, 24svh, 230px);
+      display: grid;
+      place-items: center;
+      color: var(--button-text);
+    }
+
+    .artists-orbit::before,
+    .artists-orbit::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    .artists-orbit::before {
+      width: min(62vw, 420px);
+      height: min(62vw, 420px);
+      border: 1px solid rgba(255, 255, 255, .22);
+      transform: rotate(-12deg) scaleY(.36);
+      animation: orbitTilt 10s ease-in-out infinite alternate;
+    }
+
+    .artists-orbit::after {
+      width: min(48vw, 310px);
+      height: min(48vw, 310px);
+      border: 1px solid rgba(207, 249, 143, .20);
+      transform: rotate(17deg) scaleY(.28);
+      filter: blur(.2px);
+      animation: orbitTilt 12s ease-in-out infinite alternate-reverse;
+    }
+
+    .artist-word {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      translate: -50% -50%;
+      padding: .58em .92em;
+      border: 1px solid rgba(255,255,255,.42);
+      border-radius: 999px;
+      background: rgba(255,255,255,.18);
+      box-shadow:
+        0 14px 35px rgba(31, 65, 112, .18),
+        inset 0 1px 0 rgba(255,255,255,.34);
+      backdrop-filter: blur(8px);
+      font-size: clamp(18px, 3.2vw, 34px);
+      font-weight: 760;
+      letter-spacing: .015em;
+      opacity: 0;
+      filter: blur(10px);
+      transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(.82) rotate(var(--r, 0deg));
+      transition:
+        opacity .75s ease,
+        transform .95s cubic-bezier(.2,.8,.2,1),
+        filter .75s ease;
+      white-space: nowrap;
+      will-change: transform, opacity, filter;
+    }
+
+    .artist-word.is-active {
+      opacity: .98;
+      filter: blur(0);
+      transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(1) rotate(var(--r, 0deg));
+    }
+
+    .artist-word.is-active.is-quiet {
+      opacity: .72;
+      transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(.9) rotate(var(--r, 0deg));
+    }
+
+    .artist-word.is-center {
+      z-index: 2;
+      color: rgba(27, 49, 83, .95);
+      background: rgba(207, 249, 143, .34);
+      border-color: rgba(255,255,255,.62);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    @keyframes orbitTilt {
+      from { rotate: -3deg; }
+      to { rotate: 4deg; }
     }
 
     .actions {
@@ -210,7 +319,17 @@
     }
 
     @media (max-width: 720px) {
+      main {
+        grid-template-rows: minmax(96px, 24svh) minmax(240px, 1fr) minmax(112px, 22svh);
+        padding-inline: 14px;
+      }
+
       .poster { border-radius: 26px; }
+
+      .artist-word {
+        font-size: clamp(16px, 6vw, 28px);
+      }
+
       .button {
         width: 88%;
         min-height: 52px;
@@ -234,11 +353,20 @@
   <div class="scan" aria-hidden="true"></div>
 
   <main>
-    <section class="poster" aria-label="ВОДАЛЕСА — покупка билетов">
+    <header class="hero-logo" aria-label="ВОДАЛЕСА">
       <div class="logo-wrap" aria-hidden="true">
         <div class="logo"></div>
         <img class="logo-fallback" src="./logo.png" alt="ВОДАЛЕСА" />
       </div>
+    </header>
+
+    <section class="center-stage" aria-label="Исполнители">
+      <div class="poster">
+        <div class="artists-orbit" id="artistsOrbit" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="purchase-strip" aria-label="Покупка билетов">
       <div class="actions">
         <a class="button" id="ticketButton" href="#" target="_blank" rel="noopener noreferrer"><span>Купить билет в Тикетсклауд</span></a>
       </div>
@@ -249,6 +377,54 @@
   <script>
     (() => {
       const cfg = window.VODALESA_CONFIG || {};
+      const artistsOrbit = document.getElementById('artistsOrbit');
+      const artists = String(cfg.artists || '')
+        .split(',')
+        .map((artist) => artist.trim())
+        .filter(Boolean);
+
+      if (artistsOrbit && artists.length) {
+        const slots = [
+          { x: 0, y: -4, r: -1, center: true },
+          { x: -170, y: -54, r: -8 },
+          { x: 178, y: 46, r: 7 },
+          { x: -126, y: 78, r: 5, quiet: true },
+          { x: 118, y: -82, r: -5, quiet: true }
+        ];
+        const words = slots.map((slot, index) => {
+          const node = document.createElement('span');
+          node.className = 'artist-word';
+          if (slot.center) node.classList.add('is-center');
+          if (slot.quiet) node.classList.add('is-quiet');
+          artistsOrbit.appendChild(node);
+          return { node, slot, offset: index * 4 };
+        });
+        let step = 0;
+
+        const setWord = ({ node, slot, offset }, index) => {
+          const wobble = Math.sin((step + index) * 1.7) * 12;
+          const drift = Math.cos((step + index) * 1.1) * 10;
+          const scale = Math.min(window.innerWidth / 980, 1);
+          node.textContent = artists[(step + offset + index * 3) % artists.length];
+          node.style.setProperty('--x', `${(slot.x + wobble) * scale}px`);
+          node.style.setProperty('--y', `${(slot.y + drift) * scale}px`);
+          node.style.setProperty('--r', `${slot.r + Math.sin(step + index) * 3}deg`);
+          node.classList.add('is-active');
+        };
+
+        const cycleArtists = () => {
+          words.forEach(({ node }) => node.classList.remove('is-active'));
+          window.setTimeout(() => {
+            words.forEach(setWord);
+            step += 1;
+          }, 360);
+        };
+
+        cycleArtists();
+        window.setInterval(cycleArtists, 2600);
+        window.addEventListener('resize', cycleArtists, { passive: true });
+      }
+
       const button = document.getElementById('ticketButton');
       if (button) {
         const resetButton = () => button.classList.remove('is-redirecting');
