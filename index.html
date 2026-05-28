@@ -221,33 +221,46 @@
       left: 50%;
       top: 50%;
       translate: -50% -50%;
-      padding: .56em .9em;
-      border: 1px solid rgba(255,255,255,.46);
+      padding: .58em .92em;
+      border: 1px solid rgba(255,255,255,.42);
       border-radius: 999px;
-      color: rgba(27, 49, 83, .92);
-      background: rgba(255,255,255,.20);
+      background: rgba(255,255,255,.18);
       box-shadow:
         0 14px 35px rgba(31, 65, 112, .18),
-        inset 0 1px 0 rgba(255,255,255,.36);
+        inset 0 1px 0 rgba(255,255,255,.34);
       backdrop-filter: blur(8px);
-      font-size: clamp(17px, 2.7vw, 30px);
+      font-size: clamp(18px, 3.2vw, 34px);
       font-weight: 760;
-      letter-spacing: .035em;
+      letter-spacing: .015em;
       opacity: 0;
-      filter: blur(12px);
-      transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(.72) rotate(var(--r, 0deg));
+      filter: blur(10px);
+      transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(.82) rotate(var(--r, 0deg));
       transition:
-        opacity var(--fade, .72s) ease,
-        transform var(--move, 1.15s) cubic-bezier(.18,.82,.2,1),
-        filter var(--fade, .72s) ease;
+        opacity .75s ease,
+        transform .95s cubic-bezier(.2,.8,.2,1),
+        filter .75s ease;
       white-space: nowrap;
       will-change: transform, opacity, filter;
     }
 
     .artist-word.is-active {
-      opacity: .88;
+      opacity: .98;
       filter: blur(0);
-      transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(var(--s, .96)) rotate(var(--r, 0deg));
+      transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(1) rotate(var(--r, 0deg));
+    }
+
+    .artist-word.is-active.is-quiet {
+      opacity: .72;
+      transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(.9) rotate(var(--r, 0deg));
+    }
+
+    .artist-word.is-center {
+      z-index: 2;
+      color: rgba(27, 49, 83, .95);
+      background: rgba(207, 249, 143, .34);
+      border-color: rgba(255,255,255,.62);
+      text-transform: uppercase;
+      letter-spacing: .08em;
     }
 
     @keyframes orbitTilt {
@@ -373,85 +386,51 @@
     (() => {
       const cfg = window.VODALESA_CONFIG || {};
       const artistsOrbit = document.getElementById('artistsOrbit');
-      const artistSource = cfg.artists || [];
-      const artists = (Array.isArray(artistSource) ? artistSource : String(artistSource).split(','))
-        .map((artist) => String(artist).trim())
+      const artists = String(cfg.artists || '')
+        .split(',')
+        .map((artist) => artist.trim())
         .filter(Boolean);
 
       if (artistsOrbit && artists.length) {
-        const wordCount = Math.min(Math.max(artists.length, 5), 8);
-        const words = Array.from({ length: wordCount }, (_, index) => {
+        const slots = [
+          { x: 0, y: -4, r: -1, center: true },
+          { x: -170, y: -54, r: -8 },
+          { x: 178, y: 46, r: 7 },
+          { x: -126, y: 78, r: 5, quiet: true },
+          { x: 118, y: -82, r: -5, quiet: true }
+        ];
+        const words = slots.map((slot, index) => {
           const node = document.createElement('span');
           node.className = 'artist-word';
+          if (slot.center) node.classList.add('is-center');
+          if (slot.quiet) node.classList.add('is-quiet');
           artistsOrbit.appendChild(node);
-          return { node, index, timers: [], artistIndex: index % artists.length };
+          return { node, slot, offset: index * 4 };
         });
-        const rand = (min, max) => min + Math.random() * (max - min);
-        const schedule = (word, callback, delay) => {
-          const timer = window.setTimeout(() => {
-            word.timers = word.timers.filter((current) => current !== timer);
-            callback();
-          }, delay);
-          word.timers.push(timer);
-          return timer;
-        };
-        const clearWordTimers = (word) => {
-          word.timers.forEach((timer) => window.clearTimeout(timer));
-          word.timers = [];
-        };
-        let runId = 0;
+        let step = 0;
 
-        const placeWord = (word, immediate = false) => {
+        const setWord = ({ node, slot, offset }, index) => {
+          const wobble = Math.sin((step + index) * 1.7) * 12;
+          const drift = Math.cos((step + index) * 1.1) * 10;
           const scale = Math.min(window.innerWidth / 980, 1);
-          const angle = rand(0, Math.PI * 2);
-          const radiusX = rand(64, 220) * scale;
-          const radiusY = rand(18, 88) * scale;
-          const x = Math.cos(angle) * radiusX + rand(-26, 26) * scale;
-          const y = Math.sin(angle) * radiusY + rand(-18, 18) * scale;
-
-          const visibleArtists = new Set(
-            words
-              .filter((current) => current !== word && current.node.classList.contains('is-active'))
-              .map((current) => current.artistIndex)
-          );
-          let nextArtist = word.artistIndex;
-          for (let attempt = 0; attempt < artists.length; attempt += 1) {
-            nextArtist = (word.artistIndex + 1 + Math.floor(rand(0, artists.length - 1))) % artists.length;
-            if (!visibleArtists.has(nextArtist)) break;
-          }
-          word.artistIndex = nextArtist;
-          word.node.textContent = artists[word.artistIndex];
-          word.node.style.setProperty('--x', `${x}px`);
-          word.node.style.setProperty('--y', `${y}px`);
-          word.node.style.setProperty('--r', `${rand(-10, 10)}deg`);
-          word.node.style.setProperty('--s', `${rand(.9, 1.02)}`);
-          word.node.style.setProperty('--fade', `${rand(.58, .95)}s`);
-          word.node.style.setProperty('--move', `${rand(.92, 1.55)}s`);
-
-          schedule(word, () => word.node.classList.add('is-active'), immediate ? 40 : rand(140, 620));
+          node.textContent = artists[(step + offset + index * 3) % artists.length];
+          node.style.setProperty('--x', `${(slot.x + wobble) * scale}px`);
+          node.style.setProperty('--y', `${(slot.y + drift) * scale}px`);
+          node.style.setProperty('--r', `${slot.r + Math.sin(step + index) * 3}deg`);
+          node.classList.add('is-active');
         };
 
-        const loopWord = (word, id) => {
-          if (id !== runId) return;
-          word.node.classList.remove('is-active');
-          schedule(word, () => placeWord(word), rand(260, 900));
-          schedule(word, () => loopWord(word, id), rand(1450, 3600));
+        const cycleArtists = () => {
+          words.forEach(({ node }) => node.classList.remove('is-active'));
+          window.setTimeout(() => {
+            words.forEach(setWord);
+            step += 1;
+          }, 360);
         };
 
-        const restartArtists = () => {
-          runId += 1;
-          words.forEach((word, index) => {
-            clearWordTimers(word);
-            word.node.classList.remove('is-active');
-            schedule(word, () => {
-              placeWord(word, true);
-              schedule(word, () => loopWord(word, runId), rand(1600, 3200));
-            }, index * 120 + rand(0, 240));
-          });
-        };
-
-        restartArtists();
-        window.addEventListener('resize', restartArtists, { passive: true });
+        cycleArtists();
+        window.setInterval(cycleArtists, 2600);
+        window.addEventListener('resize', cycleArtists, { passive: true });
       }
 
       const button = document.getElementById('ticketButton');
