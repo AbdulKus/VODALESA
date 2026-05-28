@@ -301,7 +301,15 @@
 
     .button span { position: relative; z-index: 1; }
 
-    .button:hover,
+    .button:hover {
+      transform: translateY(-2px) scale(1.012);
+      background: rgba(255, 255, 255, .90);
+      border-color: rgba(255,255,255,.9);
+      box-shadow:
+        0 18px 42px rgba(47, 95, 159, .28),
+        inset 0 1px 0 rgba(255,255,255,.72);
+    }
+
     .button.is-redirecting {
       transform: translateY(-2px) scale(1.012);
       background: rgba(207, 249, 143, .90);
@@ -427,7 +435,10 @@
 
       const button = document.getElementById('ticketButton');
       if (button) {
-        const resetButton = () => button.classList.remove('is-redirecting');
+        const resetButton = () => {
+          button.classList.remove('is-redirecting');
+          button.blur();
+        };
 
         if (cfg.buttonText) button.querySelector('span').textContent = cfg.buttonText;
         if (cfg.ticketsUrl) button.href = cfg.ticketsUrl;
@@ -446,7 +457,11 @@
         });
 
         window.addEventListener('pageshow', resetButton);
+        window.addEventListener('pagehide', resetButton);
         window.addEventListener('focus', resetButton);
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) resetButton();
+        });
       }
     })();
 
