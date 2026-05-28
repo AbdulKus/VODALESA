@@ -373,9 +373,9 @@
     (() => {
       const cfg = window.VODALESA_CONFIG || {};
       const artistsOrbit = document.getElementById('artistsOrbit');
-      const artists = String(cfg.artists || '')
-        .split(',')
-        .map((artist) => artist.trim())
+      const artistSource = cfg.artists || [];
+      const artists = (Array.isArray(artistSource) ? artistSource : String(artistSource).split(','))
+        .map((artist) => String(artist).trim())
         .filter(Boolean);
 
       if (artistsOrbit && artists.length) {
@@ -384,9 +384,21 @@
           const node = document.createElement('span');
           node.className = 'artist-word';
           artistsOrbit.appendChild(node);
-          return { node, index, timer: 0, artistIndex: index % artists.length };
+          return { node, index, timers: [], artistIndex: index % artists.length };
         });
         const rand = (min, max) => min + Math.random() * (max - min);
+        const schedule = (word, callback, delay) => {
+          const timer = window.setTimeout(() => {
+            word.timers = word.timers.filter((current) => current !== timer);
+            callback();
+          }, delay);
+          word.timers.push(timer);
+          return timer;
+        };
+        const clearWordTimers = (word) => {
+          word.timers.forEach((timer) => window.clearTimeout(timer));
+          word.timers = [];
+        };
         let runId = 0;
 
         const placeWord = (word, immediate = false) => {
@@ -397,7 +409,17 @@
           const x = Math.cos(angle) * radiusX + rand(-26, 26) * scale;
           const y = Math.sin(angle) * radiusY + rand(-18, 18) * scale;
 
-          word.artistIndex = (word.artistIndex + 1 + Math.floor(rand(0, artists.length - 1))) % artists.length;
+          const visibleArtists = new Set(
+            words
+              .filter((current) => current !== word && current.node.classList.contains('is-active'))
+              .map((current) => current.artistIndex)
+          );
+          let nextArtist = word.artistIndex;
+          for (let attempt = 0; attempt < artists.length; attempt += 1) {
+            nextArtist = (word.artistIndex + 1 + Math.floor(rand(0, artists.length - 1))) % artists.length;
+            if (!visibleArtists.has(nextArtist)) break;
+          }
+          word.artistIndex = nextArtist;
           word.node.textContent = artists[word.artistIndex];
           word.node.style.setProperty('--x', `${x}px`);
           word.node.style.setProperty('--y', `${y}px`);
@@ -406,24 +428,24 @@
           word.node.style.setProperty('--fade', `${rand(.58, .95)}s`);
           word.node.style.setProperty('--move', `${rand(.92, 1.55)}s`);
 
-          window.setTimeout(() => word.node.classList.add('is-active'), immediate ? 40 : rand(140, 620));
+          schedule(word, () => word.node.classList.add('is-active'), immediate ? 40 : rand(140, 620));
         };
 
         const loopWord = (word, id) => {
           if (id !== runId) return;
           word.node.classList.remove('is-active');
-          window.setTimeout(() => placeWord(word), rand(260, 900));
-          word.timer = window.setTimeout(() => loopWord(word, id), rand(1450, 3600));
+          schedule(word, () => placeWord(word), rand(260, 900));
+          schedule(word, () => loopWord(word, id), rand(1450, 3600));
         };
 
         const restartArtists = () => {
           runId += 1;
           words.forEach((word, index) => {
-            window.clearTimeout(word.timer);
+            clearWordTimers(word);
             word.node.classList.remove('is-active');
-            window.setTimeout(() => {
+            schedule(word, () => {
               placeWord(word, true);
-              word.timer = window.setTimeout(() => loopWord(word, runId), rand(1600, 3200));
+              schedule(word, () => loopWord(word, runId), rand(1600, 3200));
             }, index * 120 + rand(0, 240));
           });
         };
