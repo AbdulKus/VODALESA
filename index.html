@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#07110d" />
+  <title>ВОДАЛЕСА — билеты</title>
+  <script src="config.js"></script>
+  <style>
+    :root {
+      --bg: #07110d;
+      --glass: rgba(5, 12, 10, .40);
+      --line: rgba(205, 255, 222, .16);
+      --green-1: #dfffd8;
+      --green-2: #8dff8a;
+      --green-3: #54c56b;
+      --green-4: #1f5a33;
+      --button-text: #07110d;
+      --button-light: #f3fff1;
+      --button-1: #d7ffd6;
+      --button-2: #67ef90;
+      --button-3: #419e59;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: #eef7ef;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      min-height: 100svh;
+      display: grid;
+      place-items: center;
+      isolation: isolate;
+    }
+
+    canvas#water {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -5;
+      background: #07110d;
+    }
+
+    .grain,
+    .vignette,
+    .scan {
+      pointer-events: none;
+      position: fixed;
+      inset: 0;
+    }
+
+    .grain {
+      z-index: -2;
+      opacity: .16;
+      mix-blend-mode: overlay;
+      background-image:
+        radial-gradient(circle at 20% 30%, rgba(255,255,255,.18) 0 1px, transparent 1.2px),
+        radial-gradient(circle at 80% 20%, rgba(255,255,255,.12) 0 1px, transparent 1.4px),
+        radial-gradient(circle at 40% 80%, rgba(255,255,255,.11) 0 1px, transparent 1.3px);
+      background-size: 38px 38px, 57px 57px, 73px 73px;
+      animation: grainDrift 7s steps(6) infinite;
+    }
+
+    .scan {
+      z-index: -1;
+      opacity: .14;
+      background: repeating-linear-gradient(
+        to bottom,
+        rgba(255,255,255,.022) 0,
+        rgba(255,255,255,.022) 1px,
+        transparent 1px,
+        transparent 5px
+      );
+      mask-image: linear-gradient(to bottom, transparent, #000 16%, #000 84%, transparent);
+    }
+
+    .vignette {
+      z-index: -3;
+      background:
+        radial-gradient(circle at 50% 38%, transparent 0 27%, rgba(3, 8, 6, .38) 70%, rgba(0, 0, 0, .82) 100%),
+        linear-gradient(135deg, rgba(75, 255, 127, .12), transparent 32%, rgba(178, 235, 255, .07) 65%, transparent);
+    }
+
+    @keyframes grainDrift {
+      0% { transform: translate(0, 0); }
+      20% { transform: translate(-2%, 1%); }
+      40% { transform: translate(1%, -2%); }
+      60% { transform: translate(2%, 2%); }
+      80% { transform: translate(-1%, -1%); }
+      100% { transform: translate(0, 0); }
+    }
+
+    main {
+      width: min(980px, calc(100vw - 28px));
+      min-height: min(640px, calc(100svh - 28px));
+      display: grid;
+      place-items: center;
+      padding: clamp(18px, 4vw, 52px);
+    }
+
+    .poster {
+      position: relative;
+      width: 100%;
+      display: grid;
+      place-items: center;
+      gap: clamp(30px, 5vw, 46px);
+      padding: clamp(28px, 6vw, 66px);
+      border: 1px solid var(--line);
+      border-radius: 34px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.08), rgba(255,255,255,.018) 38%, rgba(120,243,155,.055)),
+        var(--glass);
+      box-shadow:
+        0 24px 90px rgba(0, 0, 0, .55),
+        inset 0 1px 0 rgba(255,255,255,.18),
+        inset 0 -1px 0 rgba(255,255,255,.06);
+      backdrop-filter: blur(18px) saturate(1.2);
+      overflow: hidden;
+    }
+
+    .poster::before {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      opacity: .42;
+      background:
+        radial-gradient(circle at 16% 20%, rgba(130, 255, 172, .32), transparent 22%),
+        radial-gradient(circle at 89% 18%, rgba(190, 240, 255, .18), transparent 25%),
+        linear-gradient(105deg, transparent 0 36%, rgba(255,255,255,.11) 42%, transparent 49% 100%);
+      filter: blur(.2px);
+      z-index: -1;
+    }
+
+    .logo-wrap {
+      width: min(100%, 900px);
+      filter: drop-shadow(0 0 24px rgba(83, 255, 119, .16)) drop-shadow(0 22px 34px rgba(0,0,0,.34));
+    }
+
+    .logo {
+      width: 100%;
+      aspect-ratio: 1851 / 326;
+      background-image:
+        linear-gradient(120deg, rgba(255,255,255,.4), transparent 16%, rgba(120,243,155,.24) 30%, transparent 46%, rgba(255,255,255,.32) 58%, transparent 74%),
+        radial-gradient(circle at 18% 22%, var(--green-1) 0 4%, transparent 5%),
+        radial-gradient(circle at 73% 48%, var(--green-2) 0 3%, transparent 4%),
+        radial-gradient(circle at 32% 72%, var(--green-4) 0 8%, transparent 9%),
+        repeating-linear-gradient(105deg, var(--green-1) 0 7px, var(--green-2) 7px 10px, var(--green-4) 10px 16px, var(--green-3) 16px 20px, #cbffc4 20px 22px);
+      background-size: 180% 100%, 70px 70px, 86px 86px, 110px 110px, 46px 46px;
+      background-position: 0 0, 0 0, 30px 10px, 15px 45px, 0 0;
+      -webkit-mask: url('./logo.png') center / contain no-repeat;
+      mask: url('./logo.png') center / contain no-repeat;
+      animation: grassShift 9s ease-in-out infinite alternate;
+    }
+
+    .logo-fallback {
+      display: none;
+      width: 100%;
+      height: auto;
+      filter: sepia(1) hue-rotate(35deg) saturate(4.7) brightness(1.03) contrast(1.04)
+              drop-shadow(0 0 24px rgba(83, 255, 119, .16)) drop-shadow(0 22px 34px rgba(0,0,0,.34));
+    }
+
+    @supports not ((-webkit-mask: url('./logo.png') center / contain no-repeat) or (mask: url('./logo.png') center / contain no-repeat)) {
+      .logo { display: none; }
+      .logo-fallback { display: block; }
+    }
+
+    @keyframes grassShift {
+      from { background-position: 0 0, 0 0, 30px 10px, 15px 45px, 0 0; }
+      to { background-position: 100% 0, 22px -14px, 0 28px, 42px 6px, 18px 9px; }
+    }
+
+    .actions {
+      display: flex;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .button {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 60px;
+      min-width: min(100%, 360px);
+      padding: 0 30px;
+      border-radius: 999px;
+      color: var(--button-text);
+      background:
+        linear-gradient(135deg, rgba(255,255,255,.82), rgba(255,255,255,.1) 28%, transparent 33%),
+        linear-gradient(135deg, var(--button-1), var(--button-2) 42%, var(--button-light) 54%, var(--button-3) 100%);
+      border: 1px solid rgba(235,255,238,.7);
+      box-shadow:
+        0 16px 44px rgba(69, 255, 128, .2),
+        inset 0 1px 0 rgba(255,255,255,.95),
+        inset 0 -8px 18px rgba(0, 50, 20, .16);
+      font-weight: 760;
+      font-size: clamp(16px, 2vw, 19px);
+      text-decoration: none;
+      letter-spacing: .01em;
+      text-align: center;
+      transition: transform .25s ease, box-shadow .25s ease, filter .25s ease;
+      overflow: hidden;
+    }
+
+    .button::before {
+      content: "";
+      position: absolute;
+      inset: -80% -20%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.75), transparent);
+      transform: rotate(18deg) translateX(-90%);
+      animation: buttonGlint 4.5s ease-in-out infinite;
+    }
+
+    .button span { position: relative; z-index: 1; }
+
+    .button:hover {
+      transform: translateY(-2px) scale(1.012);
+      box-shadow:
+        0 22px 58px rgba(69, 255, 128, .28),
+        inset 0 1px 0 rgba(255,255,255,.95),
+        inset 0 -8px 18px rgba(0, 50, 20, .16);
+      filter: saturate(1.08);
+    }
+
+    @keyframes buttonGlint {
+      0%, 45% { transform: rotate(18deg) translateX(-92%); }
+      70%, 100% { transform: rotate(18deg) translateX(92%); }
+    }
+
+    .fallback {
+      display: none;
+      color: rgba(255,255,255,.72);
+      font-size: 14px;
+      text-align: center;
+    }
+
+    @media (max-width: 720px) {
+      .poster { border-radius: 26px; }
+      .button { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .001ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="water" aria-hidden="true"></canvas>
+  <div class="vignette" aria-hidden="true"></div>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="scan" aria-hidden="true"></div>
+
+  <main>
+    <section class="poster" aria-label="ВОДАЛЕСА — покупка билетов">
+      <div class="logo-wrap" aria-hidden="true">
+        <div class="logo"></div>
+        <img class="logo-fallback" src="./logo.png" alt="ВОДАЛЕСА" />
+      </div>
+      <div class="actions">
+        <a class="button" id="ticketButton" href="#" target="_blank" rel="noopener noreferrer"><span>Купить билет в Тикетсклауд</span></a>
+      </div>
+      <div class="fallback" id="fallback">Если кнопка не открывается, проверь ссылку в config.js</div>
+    </section>
+  </main>
+
+  <script>
+    (() => {
+      const cfg = window.VODALESA_CONFIG || {};
+      const button = document.getElementById('ticketButton');
+      if (button) {
+        if (cfg.buttonText) button.querySelector('span').textContent = cfg.buttonText;
+        if (cfg.ticketsUrl) button.href = cfg.ticketsUrl;
+      }
+    })();
+
+    (() => {
+      const canvas = document.getElementById('water');
+      const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'high-performance' });
+      const fallback = document.getElementById('fallback');
+
+      if (!gl) {
+        document.body.style.background = 'radial-gradient(circle at 50% 35%, #173f2b, #07110d 70%)';
+        if (fallback) fallback.style.display = 'block';
+        return;
+      }
+
+      const vertexSrc = `
+        attribute vec2 aPosition;
+        varying vec2 vUv;
+        void main() {
+          vUv = aPosition * 0.5 + 0.5;
+          gl_Position = vec4(aPosition, 0.0, 1.0);
+        }
+      `;
+
+      const fragmentSrc = `
+        precision highp float;
+        varying vec2 vUv;
+        uniform vec2 uResolution;
+        uniform float uTime;
+        uniform vec2 uPointer;
+
+        mat2 rot(float a) {
+          float s = sin(a), c = cos(a);
+          return mat2(c, -s, s, c);
+        }
+
+        float hash(vec2 p) {
+          return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+        }
+
+        float noise(vec2 p) {
+          vec2 i = floor(p);
+          vec2 f = fract(p);
+          vec2 u = f * f * (3.0 - 2.0 * f);
+          return mix(
+            mix(hash(i + vec2(0.0, 0.0)), hash(i + vec2(1.0, 0.0)), u.x),
+            mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), u.x),
+            u.y
+          );
+        }
+
+        float fbm(vec2 p) {
+          float v = 0.0;
+          float a = 0.5;
+          for (int i = 0; i < 5; i++) {
+            v += a * noise(p);
+            p = rot(0.58) * p * 2.02 + 13.7;
+            a *= 0.5;
+          }
+          return v;
+        }
+
+        float waveLayer(vec2 p, float speed, float scale, float bend) {
+          p *= scale;
+          p.x += sin(p.y * 1.8 + uTime * speed) * bend;
+          p.y += cos(p.x * 1.15 - uTime * speed * 0.7) * bend;
+          float lines = sin(p.x * 2.4 + sin(p.y * 1.6) + uTime * speed);
+          float soft = smoothstep(0.08, 1.0, abs(lines));
+          return 1.0 - soft;
+        }
+
+        void main() {
+          vec2 uv = vUv;
+          vec2 aspect = vec2(uResolution.x / uResolution.y, 1.0);
+          vec2 p = (uv - 0.5) * aspect;
+          vec2 pointer = (uPointer - 0.5) * aspect;
+
+          float t = uTime;
+          float d = length(p - pointer);
+          p += normalize(p - pointer + 0.001) * 0.035 * exp(-d * 5.5) * sin(t * 2.0 + d * 12.0);
+
+          float n1 = fbm(p * 2.0 + vec2(t * 0.035, -t * 0.025));
+          float n2 = fbm(p * 5.2 - vec2(t * 0.06, t * 0.045));
+          float water = waveLayer(p + n1 * 0.22, 0.62, 9.0, 0.16);
+          water += waveLayer(p.yx + n2 * 0.14, -0.48, 12.5, 0.1) * 0.55;
+
+          float ripple = sin((length(p) * 18.0 - t * 1.8) + n1 * 3.0) * 0.5 + 0.5;
+          float metallic = pow(max(0.0, water * 0.52 + ripple * 0.36 + n2 * 0.32), 3.2);
+          float glint = smoothstep(0.72, 1.0, sin((p.x + p.y * 0.42) * 18.0 + t * 0.95 + n1 * 4.0));
+          glint *= smoothstep(0.02, 0.85, uv.y) * smoothstep(1.0, 0.05, uv.y);
+
+          vec3 deep = vec3(0.015, 0.045, 0.035);
+          vec3 swamp = vec3(0.025, 0.18, 0.105);
+          vec3 acid = vec3(0.34, 0.93, 0.48);
+          vec3 steel = vec3(0.72, 0.86, 0.88);
+
+          vec3 col = mix(deep, swamp, n1 * 0.9 + 0.05);
+          col += acid * water * 0.075;
+          col += steel * metallic * 0.23;
+          col += vec3(0.95, 1.0, 0.9) * glint * metallic * 0.42;
+
+          float centerGlow = 1.0 - smoothstep(0.0, 0.86, length((uv - 0.5) * vec2(1.0, 1.35)));
+          col += vec3(0.07, 0.22, 0.13) * centerGlow;
+
+          float vignette = smoothstep(0.92, 0.18, length((uv - 0.5) * vec2(1.05, 1.25)));
+          col *= vignette;
+          col += deep * (1.0 - vignette) * 0.45;
+
+          float dust = hash(floor(uv * uResolution.xy * 0.55) + floor(t * 10.0));
+          col += (dust - 0.5) * 0.025;
+
+          gl_FragColor = vec4(col, 1.0);
+        }
+      `;
+
+      const compile = (type, source) => {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          console.error(gl.getShaderInfoLog(shader));
+          gl.deleteShader(shader);
+          return null;
+        }
+        return shader;
+      };
+
+      const vert = compile(gl.VERTEX_SHADER, vertexSrc);
+      const frag = compile(gl.FRAGMENT_SHADER, fragmentSrc);
+      if (!vert || !frag) return;
+
+      const program = gl.createProgram();
+      gl.attachShader(program, vert);
+      gl.attachShader(program, frag);
+      gl.linkProgram(program);
+
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        console.error(gl.getProgramInfoLog(program));
+        return;
+      }
+
+      const buffer = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
+        -1, -1,  1, -1, -1,  1,
+        -1,  1,  1, -1,  1,  1
+      ]), gl.STATIC_DRAW);
+
+      const aPosition = gl.getAttribLocation(program, 'aPosition');
+      const uResolution = gl.getUniformLocation(program, 'uResolution');
+      const uTime = gl.getUniformLocation(program, 'uTime');
+      const uPointer = gl.getUniformLocation(program, 'uPointer');
+      const pointer = { x: 0.5, y: 0.45, tx: 0.5, ty: 0.45 };
+
+      function resize() {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        const w = Math.floor(window.innerWidth * dpr);
+        const h = Math.floor(window.innerHeight * dpr);
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w;
+          canvas.height = h;
+          gl.viewport(0, 0, w, h);
+        }
+      }
+
+      function move(clientX, clientY) {
+        pointer.tx = clientX / window.innerWidth;
+        pointer.ty = 1.0 - clientY / window.innerHeight;
+      }
+
+      window.addEventListener('resize', resize, { passive: true });
+      window.addEventListener('pointermove', (e) => move(e.clientX, e.clientY), { passive: true });
+      window.addEventListener('pointerdown', (e) => move(e.clientX, e.clientY), { passive: true });
+
+      const start = performance.now();
+      function render(now) {
+        resize();
+        pointer.x += (pointer.tx - pointer.x) * 0.055;
+        pointer.y += (pointer.ty - pointer.y) * 0.055;
+
+        gl.useProgram(program);
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+        gl.enableVertexAttribArray(aPosition);
+        gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0);
+        gl.uniform2f(uResolution, canvas.width, canvas.height);
+        gl.uniform1f(uTime, (now - start) * 0.001);
+        gl.uniform2f(uPointer, pointer.x, pointer.y);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        requestAnimationFrame(render);
+      }
+      requestAnimationFrame(render);
+    })();
+  </script>
+</body>
+</html>
