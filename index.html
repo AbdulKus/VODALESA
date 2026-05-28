@@ -95,15 +95,17 @@
     }
 
     main {
-      width: min(1120px, calc(100vw - 28px));
+      width: calc(100vw - 28px);
+      max-width: 1120px;
       min-height: 100svh;
       margin: 0 auto;
       display: grid;
-      grid-template-rows: minmax(132px, 28svh) minmax(250px, 1fr) minmax(126px, 24svh);
+      grid-template-rows: auto auto auto;
       align-items: center;
       justify-items: center;
-      padding: clamp(16px, 3.5vw, 46px) clamp(14px, 4vw, 52px);
-      gap: clamp(12px, 2.4svh, 28px);
+      align-content: center;
+      padding: clamp(18px, 4svh, 42px) clamp(14px, 4vw, 52px);
+      gap: clamp(24px, 5svh, 54px);
     }
 
     .hero-logo,
@@ -115,7 +117,7 @@
     }
 
     .hero-logo {
-      align-self: stretch;
+      align-self: end;
     }
 
     .center-stage {
@@ -123,13 +125,14 @@
     }
 
     .purchase-strip {
-      align-self: stretch;
+      align-self: start;
       align-content: center;
     }
 
     .poster {
       position: relative;
-      width: min(100%, 760px);
+      width: 100%;
+      max-width: 760px;
       min-height: clamp(230px, 34svh, 360px);
       display: grid;
       place-items: center;
@@ -159,7 +162,8 @@
     }
 
     .logo-wrap {
-      width: min(100%, 1080px);
+      width: 100%;
+      max-width: 1080px;
     }
 
     .logo {
@@ -184,88 +188,140 @@
 
     .artists-orbit {
       position: relative;
-      width: min(100%, 620px);
-      min-height: clamp(170px, 24svh, 230px);
-      display: grid;
-      place-items: center;
+      width: 100%;
+      max-width: 660px;
+      min-height: clamp(190px, 27svh, 270px);
+      padding: clamp(18px, 4vw, 42px);
       color: var(--button-text);
+      overflow: hidden;
+      isolation: isolate;
     }
 
     .artists-orbit::before,
     .artists-orbit::after {
       content: "";
       position: absolute;
-      border-radius: 999px;
+      inset: 4%;
       pointer-events: none;
+      opacity: .58;
     }
 
     .artists-orbit::before {
-      width: min(62vw, 420px);
-      height: min(62vw, 420px);
-      border: 1px solid rgba(255, 255, 255, .22);
-      transform: rotate(-12deg) scaleY(.36);
-      animation: orbitTilt 10s ease-in-out infinite alternate;
+      background:
+        linear-gradient(90deg, transparent 0 17%, rgba(255,255,255,.20) 17.4% 18%, transparent 18.4% 100%),
+        linear-gradient(113deg, transparent 0 32%, rgba(207, 249, 143, .19) 32.4% 33.2%, transparent 33.7% 100%),
+        repeating-linear-gradient(172deg, rgba(255,255,255,.12) 0 1px, transparent 1px 34px);
+      -webkit-mask-image: linear-gradient(115deg, transparent 3%, #000 22%, #000 76%, transparent 96%);
+      mask-image: linear-gradient(115deg, transparent 3%, #000 22%, #000 76%, transparent 96%);
+      animation: fieldSlide 14s ease-in-out infinite alternate;
     }
 
     .artists-orbit::after {
-      width: min(48vw, 310px);
-      height: min(48vw, 310px);
-      border: 1px solid rgba(207, 249, 143, .20);
-      transform: rotate(17deg) scaleY(.28);
-      filter: blur(.2px);
-      animation: orbitTilt 12s ease-in-out infinite alternate-reverse;
+      inset: 15% 2% 10%;
+      border-top: 1px solid rgba(255,255,255,.22);
+      border-bottom: 1px solid rgba(27,49,83,.10);
+      background:
+        linear-gradient(97deg, transparent 0 9%, rgba(27,49,83,.09) 9.5% 10.6%, transparent 11.2% 50%, rgba(255,255,255,.13) 51% 52%, transparent 53%),
+        repeating-linear-gradient(87deg, transparent 0 42px, rgba(255,255,255,.12) 43px 44px, transparent 45px 92px);
+      transform: skewY(-5deg);
+      mix-blend-mode: soft-light;
+      animation: fieldBreathe 11s ease-in-out infinite alternate;
     }
 
     .artist-word {
       position: absolute;
-      left: 50%;
-      top: 50%;
-      translate: -50% -50%;
-      padding: .58em .92em;
-      border: 1px solid rgba(255,255,255,.42);
-      border-radius: 999px;
-      background: rgba(255,255,255,.18);
+      left: var(--x, 50%);
+      top: var(--y, 50%);
+      width: max-content;
+      max-width: none;
+      padding: .42em .68em .46em;
+      border: 1px solid rgba(255,255,255,.38);
+      border-radius: var(--radius, 18px 8px 22px 10px);
+      background: var(--fill, rgba(255,255,255,.19));
       box-shadow:
-        0 14px 35px rgba(31, 65, 112, .18),
-        inset 0 1px 0 rgba(255,255,255,.34);
-      backdrop-filter: blur(8px);
-      font-size: clamp(18px, 3.2vw, 34px);
-      font-weight: 760;
-      letter-spacing: .015em;
+        0 15px 34px rgba(31, 65, 112, .14),
+        inset 0 1px 0 rgba(255,255,255,.30);
+      backdrop-filter: blur(var(--blur-bg, 9px));
+      color: rgba(27, 49, 83, var(--ink, .88));
+      font-size: var(--size, clamp(17px, 3vw, 31px));
+      font-weight: var(--weight, 760);
+      line-height: .95;
+      letter-spacing: var(--spacing, .01em);
+      text-align: center;
+      overflow: visible;
       opacity: 0;
-      filter: blur(10px);
-      transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(.82) rotate(var(--r, 0deg));
+      filter: blur(13px) saturate(.86);
+      transform:
+        translate3d(-50%, -50%, 0)
+        translate3d(var(--dx, 0px), var(--dy, 0px), 0)
+        scale(.76)
+        rotate(var(--r, 0deg));
       transition:
-        opacity .75s ease,
-        transform .95s cubic-bezier(.2,.8,.2,1),
-        filter .75s ease;
+        opacity .9s ease var(--delay, 0ms),
+        transform 1.15s cubic-bezier(.18,.82,.16,1) var(--delay, 0ms),
+        filter .9s ease var(--delay, 0ms),
+        border-radius 1.15s ease var(--delay, 0ms);
       white-space: nowrap;
       will-change: transform, opacity, filter;
+      animation: wordDrift var(--speed, 7s) ease-in-out infinite alternate;
+      animation-delay: var(--float-delay, 0s);
+      transform-origin: center;
     }
 
     .artist-word.is-active {
-      opacity: .98;
-      filter: blur(0);
-      transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(1) rotate(var(--r, 0deg));
+      opacity: var(--alpha, .9);
+      filter: blur(var(--soft, 0px)) saturate(1.02);
+      transform:
+        translate3d(-50%, -50%, 0)
+        translate3d(var(--dx, 0px), var(--dy, 0px), 0)
+        scale(var(--scale, 1))
+        rotate(var(--r, 0deg));
     }
 
-    .artist-word.is-active.is-quiet {
-      opacity: .72;
-      transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(.9) rotate(var(--r, 0deg));
+    .artist-word.is-large {
+      z-index: 3;
+      --size: clamp(24px, 4.6vw, 48px);
+      --weight: 830;
+      --fill: rgba(207, 249, 143, .32);
+      --ink: .94;
     }
 
-    .artist-word.is-center {
-      z-index: 2;
-      color: rgba(27, 49, 83, .95);
-      background: rgba(207, 249, 143, .34);
-      border-color: rgba(255,255,255,.62);
-      text-transform: uppercase;
-      letter-spacing: .08em;
+    .artist-word.is-thread {
+      --size: clamp(13px, 2vw, 19px);
+      --weight: 680;
+      --spacing: .12em;
+      --fill: rgba(255,255,255,.11);
+      --alpha: .62;
     }
 
-    @keyframes orbitTilt {
-      from { rotate: -3deg; }
-      to { rotate: 4deg; }
+    .artist-word.is-ghost {
+      --fill: rgba(101, 139, 208, .12);
+      --alpha: .46;
+      --soft: 1.2px;
+      border-color: rgba(255,255,255,.24);
+      color: rgba(255,255,255,.78);
+      mix-blend-mode: screen;
+    }
+
+    .artist-word.is-solid {
+      --fill: rgba(255,255,255,.36);
+      --blur-bg: 5px;
+      border-color: rgba(255,255,255,.58);
+    }
+
+    @keyframes fieldSlide {
+      from { transform: translate3d(-2%, 1%, 0) skewY(-2deg); }
+      to { transform: translate3d(2%, -1%, 0) skewY(3deg); }
+    }
+
+    @keyframes fieldBreathe {
+      from { transform: translate3d(1%, -2%, 0) skewY(-6deg) scaleX(.98); opacity: .36; }
+      to { transform: translate3d(-1%, 2%, 0) skewY(3deg) scaleX(1.03); opacity: .68; }
+    }
+
+    @keyframes wordDrift {
+      from { margin-left: calc(var(--float-x, 8px) * -1); margin-top: var(--float-y, 6px); }
+      to { margin-left: var(--float-x, 8px); margin-top: calc(var(--float-y, 6px) * -1); }
     }
 
     .actions {
@@ -320,18 +376,33 @@
 
     @media (max-width: 720px) {
       main {
-        grid-template-rows: minmax(96px, 24svh) minmax(240px, 1fr) minmax(112px, 22svh);
-        padding-inline: 14px;
+        padding: clamp(18px, 4svh, 34px) 14px;
+        gap: clamp(28px, 5.2svh, 46px);
       }
 
-      .poster { border-radius: 26px; }
+      .logo-wrap,
+      .poster {
+        width: calc(100vw - 56px);
+        max-width: 100%;
+      }
 
-      .artist-word {
-        font-size: clamp(16px, 6vw, 28px);
+      .poster {
+        border-radius: 26px;
+        padding-inline: 22px;
+      }
+
+      .artists-orbit {
+        width: min(100%, 520px);
+        min-height: clamp(210px, 36svh, 290px);
+        padding: 28px 22px;
+      }
+
+      .artist-word.is-large {
+        --size: clamp(22px, 8vw, 34px);
       }
 
       .button {
-        width: 88%;
+        width: min(88vw, 360px);
         min-height: 52px;
         min-width: 0;
       }
@@ -385,43 +456,67 @@
 
       if (artistsOrbit && artists.length) {
         const slots = [
-          { x: 0, y: -4, r: -1, center: true },
-          { x: -170, y: -54, r: -8 },
-          { x: 178, y: 46, r: 7 },
-          { x: -126, y: 78, r: 5, quiet: true },
-          { x: 118, y: -82, r: -5, quiet: true }
+          { x: 49, y: 48, r: -2, kind: 'is-large', alpha: .96, scale: 1.02, radius: '22px 8px 26px 12px' },
+          { x: 26, y: 31, r: -12, kind: 'is-thread', alpha: .68, scale: .9, radius: '9px 24px 8px 18px' },
+          { x: 73, y: 34, r: 8, kind: 'is-solid', alpha: .82, scale: .92, radius: '28px 12px 18px 9px' },
+          { x: 31, y: 68, r: 7, kind: 'is-ghost', alpha: .46, scale: .84, radius: '16px 7px 30px 12px' },
+          { x: 66, y: 70, r: -8, kind: 'is-thread', alpha: .62, scale: .82, radius: '8px 21px 11px 26px' },
+          { x: 78, y: 55, r: 15, kind: 'is-ghost', alpha: .38, scale: .76, radius: '24px 10px 7px 19px' },
+          { x: 22, y: 52, r: -15, kind: 'is-solid', alpha: .68, scale: .78, radius: '12px 28px 18px 8px' },
+          { x: 56, y: 23, r: 4, kind: 'is-ghost', alpha: .43, scale: .76, radius: '30px 14px 11px 20px' },
+          { x: 46, y: 79, r: 2, kind: 'is-thread', alpha: .54, scale: .76, radius: '7px 18px 26px 11px' }
         ];
         const words = slots.map((slot, index) => {
           const node = document.createElement('span');
           node.className = 'artist-word';
-          if (slot.center) node.classList.add('is-center');
-          if (slot.quiet) node.classList.add('is-quiet');
+          node.classList.add(slot.kind);
+          node.style.setProperty('--x', `${slot.x}%`);
+          node.style.setProperty('--y', `${slot.y}%`);
+          node.style.setProperty('--alpha', slot.alpha);
+          node.style.setProperty('--scale', slot.scale);
+          node.style.setProperty('--radius', slot.radius);
+          node.style.setProperty('--delay', `${index * 55}ms`);
+          node.style.setProperty('--speed', `${6 + (index % 5) * 1.4}s`);
+          node.style.setProperty('--float-delay', `${index * -.7}s`);
+          node.style.setProperty('--float-x', `${5 + (index % 4) * 3}px`);
+          node.style.setProperty('--float-y', `${4 + (index % 3) * 4}px`);
           artistsOrbit.appendChild(node);
-          return { node, slot, offset: index * 4 };
+          return { node, slot, offset: index * 7 };
         });
         let step = 0;
 
         const setWord = ({ node, slot, offset }, index) => {
-          const wobble = Math.sin((step + index) * 1.7) * 12;
-          const drift = Math.cos((step + index) * 1.1) * 10;
-          const scale = Math.min(window.innerWidth / 980, 1);
-          node.textContent = artists[(step + offset + index * 3) % artists.length];
-          node.style.setProperty('--x', `${(slot.x + wobble) * scale}px`);
-          node.style.setProperty('--y', `${(slot.y + drift) * scale}px`);
-          node.style.setProperty('--r', `${slot.r + Math.sin(step + index) * 3}deg`);
+          const pulse = step * .83 + index * 1.37;
+          const driftX = Math.sin(pulse) * (5 + (index % 3) * 3);
+          const driftY = Math.cos(pulse * .78) * (4 + (index % 4) * 2);
+          const artistIndex = (step * 2 + offset) % artists.length;
+          const label = artists[artistIndex];
+          const narrow = window.matchMedia('(max-width: 720px)').matches;
+          node.textContent = label;
+          const safeRatio = slot.kind === 'is-large' ? (narrow ? .58 : .52) : (narrow ? .42 : .36);
+          const safeWidth = artistsOrbit.clientWidth * safeRatio;
+          const fitScale = Math.min(1, safeWidth / Math.max(node.scrollWidth, 1));
+          const minScale = slot.kind === 'is-large' ? (narrow ? .56 : .64) : (narrow ? .56 : .62);
+          node.style.setProperty('--dx', `${driftX}px`);
+          node.style.setProperty('--dy', `${driftY}px`);
+          node.style.setProperty('--r', `${slot.r + Math.sin(pulse * 1.18) * 7}deg`);
+          node.style.setProperty('--scale', slot.scale * Math.max(minScale, fitScale));
           node.classList.add('is-active');
         };
 
         const cycleArtists = () => {
-          words.forEach(({ node }) => node.classList.remove('is-active'));
+          words.forEach(({ node }, index) => {
+            if ((step + index) % 3 !== 0) return;
+            node.classList.remove('is-active');
+          });
           window.setTimeout(() => {
             words.forEach(setWord);
             step += 1;
-          }, 360);
+          }, 420);
         };
 
         cycleArtists();
-        window.setInterval(cycleArtists, 2600);
+        window.setInterval(cycleArtists, 2300);
         window.addEventListener('resize', cycleArtists, { passive: true });
       }
 
