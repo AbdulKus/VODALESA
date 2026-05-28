@@ -24,16 +24,17 @@
     html, body {
       margin: 0;
       min-height: 100%;
-      overflow: hidden;
+      overflow-x: hidden;
       background: var(--bg);
       color: #1b3153;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      touch-action: none;
     }
 
     body {
       min-height: 100svh;
+      min-height: 100dvh;
       isolation: isolate;
+      overscroll-behavior: none;
     }
 
     canvas#water {
@@ -95,15 +96,16 @@
     }
 
     main {
-      width: min(1120px, calc(100vw - 28px));
+      width: min(1180px, calc(100vw - 24px));
       min-height: 100svh;
+      min-height: 100dvh;
       margin: 0 auto;
       display: grid;
-      grid-template-rows: minmax(132px, 28svh) minmax(250px, 1fr) minmax(126px, 24svh);
+      grid-template-rows: minmax(86px, clamp(104px, 22dvh, 238px)) minmax(300px, 1fr) minmax(96px, clamp(104px, 18dvh, 178px));
       align-items: center;
       justify-items: center;
-      padding: clamp(16px, 3.5vw, 46px) clamp(14px, 4vw, 52px);
-      gap: clamp(12px, 2.4svh, 28px);
+      padding: max(14px, env(safe-area-inset-top)) clamp(12px, 4vw, 54px) max(14px, env(safe-area-inset-bottom));
+      gap: clamp(10px, 2.2dvh, 28px);
     }
 
     .hero-logo,
@@ -129,19 +131,20 @@
 
     .poster {
       position: relative;
-      width: min(100%, 760px);
-      min-height: clamp(230px, 34svh, 360px);
+      width: min(100%, 840px);
+      min-height: clamp(280px, 42dvh, 470px);
       display: grid;
       place-items: center;
-      padding: clamp(28px, 5vw, 58px);
+      padding: clamp(18px, 4.6vw, 58px);
       border: 1px solid var(--line);
-      border-radius: 34px;
+      border-radius: clamp(24px, 4vw, 42px);
       background:
+        linear-gradient(135deg, rgba(255,255,255,.13), rgba(148, 217, 197, .52) 45%, rgba(207, 249, 143, .18)),
         var(--glass);
       box-shadow:
         0 24px 90px rgba(33, 71, 122, .28),
         inset 0 1px 0 rgba(255,255,255,.28);
-      backdrop-filter: blur(14px);
+      backdrop-filter: blur(16px) saturate(1.12);
       overflow: hidden;
     }
 
@@ -184,36 +187,68 @@
 
     .artists-orbit {
       position: relative;
-      width: min(100%, 620px);
-      min-height: clamp(170px, 24svh, 230px);
+      width: min(100%, 700px);
+      min-height: clamp(240px, 34dvh, 350px);
       display: grid;
       place-items: center;
       color: var(--button-text);
+      perspective: 900px;
+      transform-style: preserve-3d;
     }
 
     .artists-orbit::before,
     .artists-orbit::after {
       content: "";
       position: absolute;
-      border-radius: 999px;
+      inset: 50% auto auto 50%;
+      width: clamp(170px, 46vw, 430px);
+      aspect-ratio: 1;
+      border-radius: 38% 62% 52% 48% / 48% 44% 56% 52%;
       pointer-events: none;
+      translate: -50% -50%;
+      transform: rotate(var(--blob-rotate, -8deg)) skew(-6deg) scaleY(.68);
+      animation: liquidBloom 12s ease-in-out infinite alternate;
     }
 
     .artists-orbit::before {
-      width: min(62vw, 420px);
-      height: min(62vw, 420px);
-      border: 1px solid rgba(255, 255, 255, .22);
-      transform: rotate(-12deg) scaleY(.36);
-      animation: orbitTilt 10s ease-in-out infinite alternate;
+      background:
+        radial-gradient(circle at 34% 28%, rgba(255,255,255,.42), transparent 0 18%, transparent 36%),
+        radial-gradient(circle at 64% 58%, rgba(207, 249, 143, .48), transparent 0 14%, transparent 42%),
+        linear-gradient(135deg, rgba(148,217,197,.35), rgba(101,139,208,.14));
+      border: 1px solid rgba(255,255,255,.22);
+      box-shadow: inset 0 0 42px rgba(255,255,255,.17), 0 24px 70px rgba(27,49,83,.16);
+      filter: blur(.2px);
     }
 
     .artists-orbit::after {
-      width: min(48vw, 310px);
-      height: min(48vw, 310px);
-      border: 1px solid rgba(207, 249, 143, .20);
-      transform: rotate(17deg) scaleY(.28);
-      filter: blur(.2px);
-      animation: orbitTilt 12s ease-in-out infinite alternate-reverse;
+      width: clamp(210px, 58vw, 540px);
+      border: 1px solid rgba(255,255,255,.20);
+      background:
+        conic-gradient(from 110deg, transparent, rgba(207,249,143,.23), transparent 34%, rgba(255,255,255,.19), transparent 68%, rgba(148,217,197,.26), transparent);
+      mask-image: radial-gradient(circle, transparent 0 44%, #000 45% 49%, transparent 50% 100%);
+      opacity: .76;
+      transform: rotate(18deg) scaleY(.52);
+      animation: ringFloat 16s ease-in-out infinite;
+    }
+
+    .artists-field {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: visible;
+      opacity: .74;
+      filter: drop-shadow(0 12px 22px rgba(27,49,83,.14));
+    }
+
+    .artists-field path {
+      fill: none;
+      stroke: rgba(255,255,255,.36);
+      stroke-width: 1.1;
+      stroke-linecap: round;
+      stroke-dasharray: 4 10;
+      animation: dashFlow 12s linear infinite;
     }
 
     .artist-word {
@@ -221,51 +256,97 @@
       left: 50%;
       top: 50%;
       translate: -50% -50%;
-      padding: .58em .92em;
-      border: 1px solid rgba(255,255,255,.42);
+      max-width: min(46vw, 260px);
+      padding: .56em .9em .6em;
+      border: 1px solid rgba(255,255,255,.38);
       border-radius: 999px;
-      background: rgba(255,255,255,.18);
+      background: linear-gradient(135deg, rgba(255,255,255,.24), rgba(255,255,255,.10));
       box-shadow:
-        0 14px 35px rgba(31, 65, 112, .18),
-        inset 0 1px 0 rgba(255,255,255,.34);
-      backdrop-filter: blur(8px);
-      font-size: clamp(18px, 3.2vw, 34px);
+        0 14px 35px rgba(31, 65, 112, .16),
+        inset 0 1px 0 rgba(255,255,255,.36);
+      backdrop-filter: blur(9px) saturate(1.08);
+      font-size: clamp(14px, 2.1vw, 26px);
       font-weight: 760;
-      letter-spacing: .015em;
+      letter-spacing: .025em;
+      line-height: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
       opacity: 0;
       filter: blur(10px);
-      transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(.82) rotate(var(--r, 0deg));
+      transform: translate3d(var(--x, 0px), var(--y, 0px), var(--z, 0px)) scale(.78) rotate(var(--r, 0deg));
       transition:
-        opacity .75s ease,
-        transform .95s cubic-bezier(.2,.8,.2,1),
-        filter .75s ease;
+        opacity .8s ease,
+        transform 1s cubic-bezier(.2,.8,.2,1),
+        filter .8s ease,
+        background .8s ease,
+        border-color .8s ease;
       white-space: nowrap;
       will-change: transform, opacity, filter;
     }
 
-    .artist-word.is-active {
-      opacity: .98;
-      filter: blur(0);
-      transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(1) rotate(var(--r, 0deg));
+    .artist-word::before {
+      content: "";
+      position: absolute;
+      inset: -40% -30%;
+      background: linear-gradient(100deg, transparent 22%, rgba(255,255,255,.44), transparent 58%);
+      translate: -70% 0;
+      rotate: 8deg;
+      transition: translate 1s ease;
     }
 
-    .artist-word.is-active.is-quiet {
-      opacity: .72;
-      transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(.9) rotate(var(--r, 0deg));
+    .artist-word.is-active {
+      opacity: var(--word-opacity, .9);
+      filter: blur(0);
+      transform: translate3d(var(--x, 0px), var(--y, 0px), var(--z, 0px)) scale(var(--word-scale, 1)) rotate(var(--r, 0deg));
+    }
+
+    .artist-word.is-active::before {
+      translate: 70% 0;
     }
 
     .artist-word.is-center {
-      z-index: 2;
-      color: rgba(27, 49, 83, .95);
-      background: rgba(207, 249, 143, .34);
-      border-color: rgba(255,255,255,.62);
+      z-index: 3;
+      max-width: min(74vw, 420px);
+      color: rgba(20, 42, 73, .98);
+      background:
+        radial-gradient(circle at 20% 10%, rgba(255,255,255,.48), transparent 34%),
+        linear-gradient(135deg, rgba(207, 249, 143, .82), rgba(148,217,197,.62));
+      border-color: rgba(255,255,255,.74);
+      box-shadow:
+        0 22px 60px rgba(31,65,112,.24),
+        inset 0 1px 0 rgba(255,255,255,.72);
       text-transform: uppercase;
-      letter-spacing: .08em;
+      letter-spacing: .1em;
+      font-size: clamp(24px, 5vw, 58px);
+      --word-scale: 1;
+      --word-opacity: .98;
     }
 
-    @keyframes orbitTilt {
-      from { rotate: -3deg; }
-      to { rotate: 4deg; }
+    .artist-word.is-whisper {
+      --word-scale: .82;
+      --word-opacity: .55;
+      font-weight: 680;
+    }
+
+    .artist-word.is-glow {
+      color: rgba(27,49,83,.92);
+      background: linear-gradient(135deg, rgba(207,249,143,.36), rgba(255,255,255,.14));
+      border-color: rgba(207,249,143,.55);
+    }
+
+    @keyframes liquidBloom {
+      0% { border-radius: 38% 62% 52% 48% / 48% 44% 56% 52%; rotate: -2deg; }
+      50% { border-radius: 58% 42% 46% 54% / 38% 58% 42% 62%; }
+      100% { border-radius: 45% 55% 62% 38% / 56% 42% 58% 44%; rotate: 5deg; }
+    }
+
+    @keyframes ringFloat {
+      0%, 100% { rotate: 0deg; scale: 1; }
+      50% { rotate: 9deg; scale: 1.04; }
+    }
+
+    @keyframes dashFlow {
+      to { stroke-dashoffset: -120; }
     }
 
     .actions {
@@ -328,20 +409,65 @@
 
     @media (max-width: 720px) {
       main {
-        grid-template-rows: minmax(96px, 24svh) minmax(240px, 1fr) minmax(112px, 22svh);
-        padding-inline: 14px;
+        width: min(100vw - 20px, 560px);
+        grid-template-rows: minmax(80px, 18dvh) minmax(300px, 1fr) minmax(88px, 16dvh);
+        padding-inline: 10px;
       }
 
-      .poster { border-radius: 26px; }
+      .poster {
+        min-height: clamp(300px, 50dvh, 430px);
+      }
 
-      .artist-word {
-        font-size: clamp(16px, 6vw, 28px);
+      .artists-orbit {
+        min-height: clamp(260px, 42dvh, 350px);
+      }
+
+      .artist-word:not(.is-center) {
+        max-width: 42vw;
+        font-size: clamp(12px, 3.8vw, 18px);
       }
 
       .button {
-        width: 88%;
+        width: min(92%, 360px);
         min-height: 52px;
         min-width: 0;
+      }
+    }
+
+    @media (max-width: 420px) {
+      main {
+        width: calc(100vw - 14px);
+        grid-template-rows: minmax(64px, 16dvh) minmax(310px, 1fr) minmax(82px, 15dvh);
+        gap: 8px;
+      }
+
+      .poster {
+        padding: 14px;
+      }
+
+      .artist-word.is-center {
+        max-width: 82vw;
+        letter-spacing: .075em;
+        font-size: clamp(22px, 9.5vw, 40px);
+      }
+    }
+
+    @media (max-height: 640px) and (orientation: landscape) {
+      main {
+        grid-template-columns: minmax(180px, .9fr) minmax(320px, 1.35fr) minmax(170px, .8fr);
+        grid-template-rows: 1fr;
+        width: min(1240px, calc(100vw - 24px));
+        min-height: 100dvh;
+      }
+
+      .poster,
+      .artists-orbit {
+        min-height: min(78dvh, 360px);
+      }
+
+      .button {
+        min-width: 0;
+        width: min(100%, 260px);
       }
     }
 
@@ -392,45 +518,75 @@
         .filter(Boolean);
 
       if (artistsOrbit && artists.length) {
+        const field = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        field.classList.add('artists-field');
+        field.setAttribute('viewBox', '0 0 100 100');
+        field.setAttribute('preserveAspectRatio', 'none');
+        field.setAttribute('aria-hidden', 'true');
+        ['M8 52 C26 12 68 15 92 46 C70 38 39 64 14 76', 'M12 34 C36 58 60 8 88 30 C76 66 34 82 16 56'].forEach((d) => {
+          const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+          path.setAttribute('d', d);
+          field.appendChild(path);
+        });
+        artistsOrbit.appendChild(field);
+
         const slots = [
-          { x: 0, y: -4, r: -1, center: true },
-          { x: -170, y: -54, r: -8 },
-          { x: 178, y: 46, r: 7 },
-          { x: -126, y: 78, r: 5, quiet: true },
-          { x: 118, y: -82, r: -5, quiet: true }
+          { x: 0, y: 0, z: 38, r: -1, center: true },
+          { x: -228, y: -92, z: 4, r: -11, glow: true },
+          { x: 228, y: 82, z: 2, r: 9 },
+          { x: -184, y: 112, z: -16, r: 7, whisper: true },
+          { x: 170, y: -126, z: -10, r: -7, whisper: true },
+          { x: -42, y: -150, z: -24, r: 4, glow: true },
+          { x: 68, y: 148, z: -28, r: -5, whisper: true }
         ];
         const words = slots.map((slot, index) => {
           const node = document.createElement('span');
           node.className = 'artist-word';
           if (slot.center) node.classList.add('is-center');
-          if (slot.quiet) node.classList.add('is-quiet');
+          if (slot.whisper) node.classList.add('is-whisper');
+          if (slot.glow) node.classList.add('is-glow');
           artistsOrbit.appendChild(node);
-          return { node, slot, offset: index * 4 };
+          return { node, slot, offset: index * 3 };
         });
         let step = 0;
+        let resizeTimer;
+
+        const layoutScale = () => {
+          const rect = artistsOrbit.getBoundingClientRect();
+          const widthScale = rect.width / 760;
+          const heightScale = rect.height / 390;
+          const edgeScale = Math.max(0.32, (rect.width - 150) / 520);
+          return Math.max(0.32, Math.min(widthScale, heightScale, edgeScale, 1));
+        };
 
         const setWord = ({ node, slot, offset }, index) => {
-          const wobble = Math.sin((step + index) * 1.7) * 12;
-          const drift = Math.cos((step + index) * 1.1) * 10;
-          const scale = Math.min(window.innerWidth / 980, 1);
-          node.textContent = artists[(step + offset + index * 3) % artists.length];
+          const scale = layoutScale();
+          const phase = step * 0.8 + index * 1.37;
+          const wobble = Math.sin(phase) * (slot.center ? 4 : 18);
+          const drift = Math.cos(phase * 0.9) * (slot.center ? 3 : 14);
+          node.textContent = artists[(step + offset + index * 2) % artists.length];
           node.style.setProperty('--x', `${(slot.x + wobble) * scale}px`);
           node.style.setProperty('--y', `${(slot.y + drift) * scale}px`);
-          node.style.setProperty('--r', `${slot.r + Math.sin(step + index) * 3}deg`);
+          node.style.setProperty('--z', `${slot.z || 0}px`);
+          node.style.setProperty('--r', `${slot.r + Math.sin(phase) * 3}deg`);
           node.classList.add('is-active');
         };
 
         const cycleArtists = () => {
           words.forEach(({ node }) => node.classList.remove('is-active'));
           window.setTimeout(() => {
+            artistsOrbit.style.setProperty('--blob-rotate', `${-10 + (step % 8) * 3}deg`);
             words.forEach(setWord);
             step += 1;
-          }, 360);
+          }, 320);
         };
 
         cycleArtists();
-        window.setInterval(cycleArtists, 2600);
-        window.addEventListener('resize', cycleArtists, { passive: true });
+        window.setInterval(cycleArtists, 2800);
+        window.addEventListener('resize', () => {
+          window.clearTimeout(resizeTimer);
+          resizeTimer = window.setTimeout(cycleArtists, 120);
+        }, { passive: true });
       }
 
       const button = document.getElementById('ticketButton');
