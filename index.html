@@ -33,8 +33,6 @@
 
     body {
       min-height: 100svh;
-      display: grid;
-      place-items: center;
       isolation: isolate;
     }
 
@@ -97,20 +95,45 @@
     }
 
     main {
-      width: min(980px, calc(100vw - 28px));
-      min-height: min(640px, calc(100svh - 28px));
+      width: min(1120px, calc(100vw - 28px));
+      min-height: 100svh;
+      margin: 0 auto;
+      display: grid;
+      grid-template-rows: minmax(132px, 28svh) minmax(250px, 1fr) minmax(126px, 24svh);
+      align-items: center;
+      justify-items: center;
+      padding: clamp(16px, 3.5vw, 46px) clamp(14px, 4vw, 52px);
+      gap: clamp(12px, 2.4svh, 28px);
+    }
+
+    .hero-logo,
+    .center-stage,
+    .purchase-strip {
+      width: 100%;
       display: grid;
       place-items: center;
-      padding: clamp(18px, 4vw, 52px);
+    }
+
+    .hero-logo {
+      align-self: stretch;
+    }
+
+    .center-stage {
+      align-self: center;
+    }
+
+    .purchase-strip {
+      align-self: stretch;
+      align-content: center;
     }
 
     .poster {
       position: relative;
-      width: 100%;
+      width: min(100%, 760px);
+      min-height: clamp(230px, 34svh, 360px);
       display: grid;
       place-items: center;
-      gap: clamp(30px, 5vw, 46px);
-      padding: clamp(28px, 6vw, 66px);
+      padding: clamp(28px, 5vw, 58px);
       border: 1px solid var(--line);
       border-radius: 34px;
       background:
@@ -136,7 +159,7 @@
     }
 
     .logo-wrap {
-      width: min(100%, 900px);
+      width: min(100%, 1080px);
     }
 
     .logo {
@@ -157,6 +180,79 @@
     @supports not ((-webkit-mask: url('./logo.png') center / contain no-repeat) or (mask: url('./logo.png') center / contain no-repeat)) {
       .logo { display: none; }
       .logo-fallback { display: block; }
+    }
+
+    .artists-orbit {
+      position: relative;
+      width: min(100%, 620px);
+      min-height: clamp(170px, 24svh, 230px);
+      display: grid;
+      place-items: center;
+      color: var(--button-text);
+    }
+
+    .artists-orbit::before,
+    .artists-orbit::after {
+      content: "";
+      position: absolute;
+      border-radius: 999px;
+      pointer-events: none;
+    }
+
+    .artists-orbit::before {
+      width: min(62vw, 420px);
+      height: min(62vw, 420px);
+      border: 1px solid rgba(255, 255, 255, .22);
+      transform: rotate(-12deg) scaleY(.36);
+      animation: orbitTilt 10s ease-in-out infinite alternate;
+    }
+
+    .artists-orbit::after {
+      width: min(48vw, 310px);
+      height: min(48vw, 310px);
+      border: 1px solid rgba(207, 249, 143, .20);
+      transform: rotate(17deg) scaleY(.28);
+      filter: blur(.2px);
+      animation: orbitTilt 12s ease-in-out infinite alternate-reverse;
+    }
+
+    .artist-word {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      translate: -50% -50%;
+      padding: .56em .9em;
+      border: 1px solid rgba(255,255,255,.46);
+      border-radius: 999px;
+      color: rgba(27, 49, 83, .92);
+      background: rgba(255,255,255,.20);
+      box-shadow:
+        0 14px 35px rgba(31, 65, 112, .18),
+        inset 0 1px 0 rgba(255,255,255,.36);
+      backdrop-filter: blur(8px);
+      font-size: clamp(17px, 2.7vw, 30px);
+      font-weight: 760;
+      letter-spacing: .035em;
+      opacity: 0;
+      filter: blur(12px);
+      transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(.72) rotate(var(--r, 0deg));
+      transition:
+        opacity var(--fade, .72s) ease,
+        transform var(--move, 1.15s) cubic-bezier(.18,.82,.2,1),
+        filter var(--fade, .72s) ease;
+      white-space: nowrap;
+      will-change: transform, opacity, filter;
+    }
+
+    .artist-word.is-active {
+      opacity: .88;
+      filter: blur(0);
+      transform: translate3d(var(--x, 0px), var(--y, 0px), 0) scale(var(--s, .96)) rotate(var(--r, 0deg));
+    }
+
+    @keyframes orbitTilt {
+      from { rotate: -3deg; }
+      to { rotate: 4deg; }
     }
 
     .actions {
@@ -192,7 +288,15 @@
 
     .button span { position: relative; z-index: 1; }
 
-    .button:hover,
+    .button:hover {
+      transform: translateY(-2px) scale(1.012);
+      background: rgba(255, 255, 255, .90);
+      border-color: rgba(255,255,255,.9);
+      box-shadow:
+        0 18px 42px rgba(47, 95, 159, .28),
+        inset 0 1px 0 rgba(255,255,255,.72);
+    }
+
     .button.is-redirecting {
       transform: translateY(-2px) scale(1.012);
       background: rgba(207, 249, 143, .90);
@@ -210,7 +314,17 @@
     }
 
     @media (max-width: 720px) {
+      main {
+        grid-template-rows: minmax(96px, 24svh) minmax(240px, 1fr) minmax(112px, 22svh);
+        padding-inline: 14px;
+      }
+
       .poster { border-radius: 26px; }
+
+      .artist-word {
+        font-size: clamp(16px, 6vw, 28px);
+      }
+
       .button {
         width: 88%;
         min-height: 52px;
@@ -234,11 +348,20 @@
   <div class="scan" aria-hidden="true"></div>
 
   <main>
-    <section class="poster" aria-label="ВОДАЛЕСА — покупка билетов">
+    <header class="hero-logo" aria-label="ВОДАЛЕСА">
       <div class="logo-wrap" aria-hidden="true">
         <div class="logo"></div>
         <img class="logo-fallback" src="./logo.png" alt="ВОДАЛЕСА" />
       </div>
+    </header>
+
+    <section class="center-stage" aria-label="Исполнители">
+      <div class="poster">
+        <div class="artists-orbit" id="artistsOrbit" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="purchase-strip" aria-label="Покупка билетов">
       <div class="actions">
         <a class="button" id="ticketButton" href="#" target="_blank" rel="noopener noreferrer"><span>Купить билет в Тикетсклауд</span></a>
       </div>
@@ -249,9 +372,72 @@
   <script>
     (() => {
       const cfg = window.VODALESA_CONFIG || {};
+      const artistsOrbit = document.getElementById('artistsOrbit');
+      const artists = String(cfg.artists || '')
+        .split(',')
+        .map((artist) => artist.trim())
+        .filter(Boolean);
+
+      if (artistsOrbit && artists.length) {
+        const wordCount = Math.min(Math.max(artists.length, 5), 8);
+        const words = Array.from({ length: wordCount }, (_, index) => {
+          const node = document.createElement('span');
+          node.className = 'artist-word';
+          artistsOrbit.appendChild(node);
+          return { node, index, timer: 0, artistIndex: index % artists.length };
+        });
+        const rand = (min, max) => min + Math.random() * (max - min);
+        let runId = 0;
+
+        const placeWord = (word, immediate = false) => {
+          const scale = Math.min(window.innerWidth / 980, 1);
+          const angle = rand(0, Math.PI * 2);
+          const radiusX = rand(64, 220) * scale;
+          const radiusY = rand(18, 88) * scale;
+          const x = Math.cos(angle) * radiusX + rand(-26, 26) * scale;
+          const y = Math.sin(angle) * radiusY + rand(-18, 18) * scale;
+
+          word.artistIndex = (word.artistIndex + 1 + Math.floor(rand(0, artists.length - 1))) % artists.length;
+          word.node.textContent = artists[word.artistIndex];
+          word.node.style.setProperty('--x', `${x}px`);
+          word.node.style.setProperty('--y', `${y}px`);
+          word.node.style.setProperty('--r', `${rand(-10, 10)}deg`);
+          word.node.style.setProperty('--s', `${rand(.9, 1.02)}`);
+          word.node.style.setProperty('--fade', `${rand(.58, .95)}s`);
+          word.node.style.setProperty('--move', `${rand(.92, 1.55)}s`);
+
+          window.setTimeout(() => word.node.classList.add('is-active'), immediate ? 40 : rand(140, 620));
+        };
+
+        const loopWord = (word, id) => {
+          if (id !== runId) return;
+          word.node.classList.remove('is-active');
+          window.setTimeout(() => placeWord(word), rand(260, 900));
+          word.timer = window.setTimeout(() => loopWord(word, id), rand(1450, 3600));
+        };
+
+        const restartArtists = () => {
+          runId += 1;
+          words.forEach((word, index) => {
+            window.clearTimeout(word.timer);
+            word.node.classList.remove('is-active');
+            window.setTimeout(() => {
+              placeWord(word, true);
+              word.timer = window.setTimeout(() => loopWord(word, runId), rand(1600, 3200));
+            }, index * 120 + rand(0, 240));
+          });
+        };
+
+        restartArtists();
+        window.addEventListener('resize', restartArtists, { passive: true });
+      }
+
       const button = document.getElementById('ticketButton');
       if (button) {
-        const resetButton = () => button.classList.remove('is-redirecting');
+        const resetButton = () => {
+          button.classList.remove('is-redirecting');
+          button.blur();
+        };
 
         if (cfg.buttonText) button.querySelector('span').textContent = cfg.buttonText;
         if (cfg.ticketsUrl) button.href = cfg.ticketsUrl;
@@ -270,7 +456,11 @@
         });
 
         window.addEventListener('pageshow', resetButton);
+        window.addEventListener('pagehide', resetButton);
         window.addEventListener('focus', resetButton);
+        document.addEventListener('visibilitychange', () => {
+          if (!document.hidden) resetButton();
+        });
       }
     })();
 
