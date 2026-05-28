@@ -406,7 +406,8 @@
       const uPointer = gl.getUniformLocation(program, 'uPointer');
       const uPointerStrength = gl.getUniformLocation(program, 'uPointerStrength');
       const pointer = { x: 0.5, y: 0.45, tx: 0.5, ty: 0.45 };
-      const pointerStrength = { value: 0, target: matchMedia('(pointer: coarse)').matches ? 0 : 1 };
+      const isTouchDevice = matchMedia('(pointer: coarse)').matches;
+      const pointerStrength = { value: 0, target: isTouchDevice ? 0 : 1 };
 
       function resize() {
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -455,8 +456,9 @@
       const start = performance.now();
       function render(now) {
         resize();
-        pointer.x += (pointer.tx - pointer.x) * 0.055;
-        pointer.y += (pointer.ty - pointer.y) * 0.055;
+        const pointerFollow = isTouchDevice && pointerStrength.target > 0 ? 0.32 : 0.055;
+        pointer.x += (pointer.tx - pointer.x) * pointerFollow;
+        pointer.y += (pointer.ty - pointer.y) * pointerFollow;
         pointerStrength.value += (pointerStrength.target - pointerStrength.value) * 0.12;
 
         gl.useProgram(program);
